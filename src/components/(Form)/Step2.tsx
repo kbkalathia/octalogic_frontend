@@ -1,14 +1,17 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useBooking } from "@/src/contexts/bookings.context";
 import { formStep2Schema } from "@/src/validators/form.validator";
+import { getUniqueWheels } from "@/src/services/bookings.service";
 
 export default function FormStep2() {
   const { updateBooking, setCurrentStep } = useBooking();
+
+  const [uniqueWheels, setUniqueWheels] = useState([]);
 
   const {
     handleSubmit,
@@ -25,6 +28,19 @@ export default function FormStep2() {
     updateBooking(data);
   };
 
+  const fetchUniqueWheels = async () => {
+    try {
+      const wheels = await getUniqueWheels();
+      setUniqueWheels(wheels.data);
+    } catch (error) {
+      console.error("Failed to unique wheels:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUniqueWheels();
+  }, []);
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -32,7 +48,7 @@ export default function FormStep2() {
     >
       <h1 className="text-2xl font-semibold mb-4">Number of wheels</h1>
       <div className="flex flex-col gap-4">
-        {[2, 4].map((value) => (
+        {uniqueWheels.map((value) => (
           <div key={value} className="flex items-center gap-2">
             <RadioButton
               inputId={`wheels-${value}`}

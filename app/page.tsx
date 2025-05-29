@@ -12,7 +12,6 @@ const Success = dynamic(() => import("@/src/components/(Form)/Success"));
 
 export default function Home() {
   const { currentStep, bookingData } = useBooking();
-  console.log("bookingData = ", bookingData);
 
   const renderStep = () => {
     switch (currentStep) {

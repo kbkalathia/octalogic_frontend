@@ -9,6 +9,11 @@ export const createAccount = async (data: {
   return response.data;
 };
 
+export const getUniqueWheels = async () => {
+  const response = await axios.get(`${API_ROUTES.UNIQUE_WHEELS}`);
+  return response.data;
+};
+
 export const getVehicleTypesByWheels = async (wheels: number) => {
   const response = await axios.get(`${API_ROUTES.VEHICLE_TYPES}${wheels}`);
   return response.data;
