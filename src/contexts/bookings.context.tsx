@@ -13,7 +13,12 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BookingContext.Provider
-      value={{ bookingData, updateBooking, currentStep, setCurrentStep }}
+      value={{
+        bookingData,
+        updateBooking,
+        currentStep,
+        setCurrentStep,
+      }}
     >
       {children}
     </BookingContext.Provider>

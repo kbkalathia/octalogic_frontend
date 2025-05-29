@@ -5,9 +5,10 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useBooking } from "@/src/contexts/bookings.context";
 import { formStep1Schema } from "@/src/validators/form.validator";
+import { createAccount } from "@/src/services/bookings.service";
 
-export default function Step1Form({ next }: { next?: () => void }) {
-  const { updateBooking } = useBooking();
+export default function Step1Form() {
+  const { updateBooking, setCurrentStep } = useBooking();
   const {
     register,
     handleSubmit,
@@ -15,15 +16,18 @@ export default function Step1Form({ next }: { next?: () => void }) {
     watch,
   } = useForm({
     resolver: yupResolver(formStep1Schema),
-    // mode: "onChange",
   });
 
   const firstName = watch("firstName");
   const lastName = watch("lastName");
 
-  const onSubmit = (data: any) => {
-    updateBooking(data);
-    next && next();
+  const onSubmit = async () => {
+    const response = await createAccount({
+      first_name: firstName,
+      last_name: lastName,
+    });
+
+    updateBooking({ user_id: response.data.id });
   };
 
   const isDisabled =
@@ -71,6 +75,7 @@ export default function Step1Form({ next }: { next?: () => void }) {
         } text-white h-10 rounded-sm p-2`}
         severity="secondary"
         disabled={isDisabled}
+        onClick={() => setCurrentStep(2)}
       />
     </form>
   );

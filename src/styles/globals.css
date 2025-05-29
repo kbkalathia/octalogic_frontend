@@ -33,3 +33,7 @@ body {
 html {
   scrollbar-width: none;
 }
+
+.p-datepicker {
+  z-index: 9999 !important;
+}

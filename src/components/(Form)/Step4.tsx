@@ -2,37 +2,32 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useBooking } from "@/src/contexts/bookings.context";
 import { getVehiclesByType } from "@/src/services/bookings.service";
+import { formStep4Schema } from "@/src/validators/form.validator";
 
-const schema = yup.object().shape({
-  vehicleId: yup.string().required("Please select a specific model"),
-});
-
-export default function FormStep4({ next }: { next?: () => void }) {
-  const { bookingData, updateBooking } = useBooking();
+export default function FormStep4() {
+  const { bookingData, updateBooking, setCurrentStep } = useBooking();
   const [vehicles, setVehicles] = useState<{ id: string; model: string }[]>([]);
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(formStep4Schema),
   });
 
-  const vehicleId = watch("vehicleId");
+  const vehicle_id = watch("vehicle_id");
 
   const fetchVehicles = async () => {
     try {
       if (bookingData.vehicleTypeId) {
         const response = await getVehiclesByType(bookingData.vehicleTypeId);
-        setVehicles(response);
+        setVehicles(response.data);
       }
     } catch (error) {
       console.error("Error fetching vehicles:", error);
@@ -45,7 +40,6 @@ export default function FormStep4({ next }: { next?: () => void }) {
 
   const onSubmit = async (data: any) => {
     updateBooking(data);
-    next && next();
   };
 
   return (
@@ -60,18 +54,18 @@ export default function FormStep4({ next }: { next?: () => void }) {
           <div key={vehicle.id} className="flex items-center gap-2">
             <RadioButton
               inputId={vehicle.id}
-              name="vehicleId"
+              name="vehicle_id"
               value={vehicle.id}
-              onChange={() => setValue("vehicleId", vehicle.id)}
-              checked={vehicleId === vehicle.id}
+              onChange={() => setValue("vehicle_id", vehicle.id)}
+              checked={vehicle_id === vehicle.id}
             />
             <label htmlFor={vehicle.id} className="text-lg">
               {vehicle.model}
             </label>
           </div>
         ))}
-        {errors.vehicleId && (
-          <p className="text-red-500 text-sm">{errors.vehicleId.message}</p>
+        {errors.vehicle_id && (
+          <p className="text-red-500 text-sm">{errors.vehicle_id.message}</p>
         )}
       </div>
 
@@ -79,9 +73,10 @@ export default function FormStep4({ next }: { next?: () => void }) {
         label="Next"
         type="submit"
         className={`w-full ${
-          !vehicleId ? "bg-gray-500" : "bg-blue-500"
+          !vehicle_id ? "bg-gray-500" : "bg-blue-500"
         } text-white h-10 rounded-sm p-2`}
-        disabled={!vehicleId}
+        disabled={!vehicle_id}
+        onClick={() => setCurrentStep(5)}
       />
     </form>
   );

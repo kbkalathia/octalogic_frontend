@@ -7,8 +7,9 @@ import { Button } from "primereact/button";
 import { useBooking } from "@/src/contexts/bookings.context";
 import { formStep2Schema } from "@/src/validators/form.validator";
 
-export default function FormStep2({ next }: { next?: () => void }) {
-  const { updateBooking } = useBooking();
+export default function FormStep2() {
+  const { updateBooking, setCurrentStep } = useBooking();
+
   const {
     handleSubmit,
     formState: { errors },
@@ -22,7 +23,6 @@ export default function FormStep2({ next }: { next?: () => void }) {
 
   const onSubmit = (data: any) => {
     updateBooking(data);
-    next && next();
   };
 
   return (
@@ -57,6 +57,7 @@ export default function FormStep2({ next }: { next?: () => void }) {
           !wheels ? "bg-gray-500" : "bg-blue-500"
         } text-white h-10 rounded-sm p-2`}
         disabled={!wheels}
+        onClick={() => setCurrentStep(3)}
       />
     </form>
   );

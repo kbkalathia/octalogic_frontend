@@ -2,29 +2,26 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useBooking } from "@/src/contexts/bookings.context";
 import { getVehicleTypesByWheels } from "@/src/services/bookings.service";
+import { formStep3Schema } from "@/src/validators/form.validator";
 
-const schema = yup.object().shape({
-  vehicleTypeId: yup.string().required("Please select a vehicle type"),
-});
+export default function FormStep3() {
+  const { bookingData, updateBooking, setCurrentStep } = useBooking();
 
-export default function FormStep3({ next }: { next?: () => void }) {
-  const { bookingData, updateBooking } = useBooking();
   const [vehicleTypes, setVehicleTypes] = useState<
     { id: string; name: string }[]
   >([]);
+
   const {
-    register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(formStep3Schema),
   });
 
   const vehicleTypeId = watch("vehicleTypeId");
@@ -33,7 +30,7 @@ export default function FormStep3({ next }: { next?: () => void }) {
     try {
       if (bookingData.wheels) {
         const types = await getVehicleTypesByWheels(bookingData.wheels);
-        setVehicleTypes(types);
+        setVehicleTypes(types.data);
       }
     } catch (error) {
       console.error("Failed to fetch vehicle types:", error);
@@ -46,7 +43,6 @@ export default function FormStep3({ next }: { next?: () => void }) {
 
   const onSubmit = (data: any) => {
     updateBooking(data);
-    next && next();
   };
 
   return (
@@ -83,6 +79,7 @@ export default function FormStep3({ next }: { next?: () => void }) {
           !vehicleTypeId ? "bg-gray-500" : "bg-blue-500"
         } text-white h-10 rounded-sm p-2`}
         disabled={!vehicleTypeId}
+        onClick={() => setCurrentStep(4)}
       />
     </form>
   );
